@@ -1,0 +1,15 @@
+{%extends 'store/main.html'%}
+{%block content%}
+    <dev class="row">
+        <dev class="col-md-6">
+            <dev class="card card=body">
+            <form action="" method="POST">
+                {%csrf_token%}
+                {{form}}
+                <input  class="btn btn-success" type="submit" name="Submit">
+            </form>
+            </dev>
+        </dev>
+    </dev>
+
+{%endblock%}
