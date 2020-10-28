@@ -1,17 +1,48 @@
 from django.db import models
 
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100,null=True)
+
+
+
 class Products(models.Model):
     CATEGORY = (
         ('Телефон','Телефон'),
         ('Компьютер','Компьютер'),
         ('Видеокарта', 'Видеокарта'),
         ('Жесткий диск', 'Жесткий диск'),
-
     )
     name = models.CharField(max_length=50,null=True)
     category = models.CharField(max_length=50,null=True,choices=CATEGORY)
+    price = models.FloatField(null=True)
     descryption = models.CharField(max_length=50,null=True)
     date_created = models.DateTimeField(auto_now_add=True,null=True)
+    tag = models.ManyToManyField(Tag,null=True)
 
     def __str__(self):
         return self.name
+
+class Customer(models.Model):
+    full_name = models.CharField(max_length=100, null=True)
+    email = models.CharField(max_length=100, null=True)
+    address =  models.CharField(max_length=100, null=True)
+    phone = models.CharField(max_length=100,null=True)
+
+    def __str__(self):
+        return self.full_name
+
+class Order(models.Model):
+    Status = (
+    ('Pending', 'Pending'),
+    ('Delivered', 'Delivered'),
+    ('Not delivered', 'Not delivered'),
+
+    )
+    customer = models.ForeignKey(Customer,null=True,on_delete=models.SET_NULL)
+    product = models.ForeignKey(Products, null=True, on_delete=models.SET_NULL)
+    date_created = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=100,null=True,choices=Status)
+
+    def __str__(self):
+        return self.product.name
