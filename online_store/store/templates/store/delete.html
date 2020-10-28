@@ -1,0 +1,9 @@
+{%extends 'store/main.html'%}
+{% block content %}
+    <form action="" method="POST">
+    {%csrf_token%}
+    <p>Are you sure want to delete: {{order}}?</p>
+     <a class="btn btn-warning" href="{% url 'home'%}">Cancel</a>
+     <input  class="btn btn-danger" type="submit" name="Confirm">
+    </form>
+{% endblock %}
