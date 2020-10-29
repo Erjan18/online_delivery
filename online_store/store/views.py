@@ -1,8 +1,21 @@
 from django.shortcuts import render,redirect
 from .models import *
 from .forms import Orderform
+from .filters import OrderFilterSet
+from django.forms import inlineformset_factory
+from django.contrib.auth.forms import UserCreationForm
 
-# Create your views here.
+def register(request):
+    form = UserCreationForm()
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    context = {'form':form}
+    return render(request, 'store/register.html',context)
+
+
 def home_page(request):
     orders_count = Order.objects.all().count()
     orders = Order.objects.all()
@@ -18,21 +31,24 @@ def products_page(request):
     return render(request, 'store/products.html',context)
 
 def costumer_page(request,pk):
-
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
     orders_count = orders.count()
-    context = {'customer':customer,'orders':orders,'orders_count':orders_count}
+    filterset = OrderFilterSet(request.GET,queryset=orders)
+    orders = filterset.qs #Обращение к model
+    context = {'customer':customer,'orders':orders,'orders_count':orders_count,'filterset':filterset}
     return render(request,'store/customer.html',context)
 
-def create_order(request):
-    form = Orderform
+def create_order(request,pk):
+    OrderFormSet = inlineformset_factory(Customer,Order,fields=('product','status'))
+    customer = Customer.objects.get(id=pk)
+    formset = OrderFormSet(instance=customer)
     if request.method == 'POST':
-        form = Orderform(request.POST)
-        if form.is_valid():
-            form.save()
+        formset = OrderFormSet(request.POST,instance=customer)
+        if formset.is_valid():
+            formset.save()
             return redirect('/')
-    context = {'form':form}
+    context = {'formset':formset,'customer':customer}
     return render(request,'store/order_form.html',context)
 
 def update_order(request,pk):
