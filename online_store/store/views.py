@@ -1,21 +1,40 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,redirect
 from .models import *
 from .forms import Orderform
 from .filters import OrderFilterSet
 from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
+from .forms import CustomerRegisterForm
+from django.contrib import messages
+from django.contrib.auth import login,authenticate,logout
 
 def register(request):
-    form = UserCreationForm()
+    form = CustomerRegisterForm()
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomerRegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            messages.success(request,'Success registration')
+            return redirect('home')
     context = {'form':form}
     return render(request, 'store/register.html',context)
 
+def login_page(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request,username=username,password=password)
+        login(request,user)
+        # if user is not None:
+        return redirect('home')
+    context = {}
+    return render(request,'store/login.html',context)
 
+def logout_page(request):
+    logout(request)
+    return redirect('login')
+@login_required(login_url='login')
 def home_page(request):
     orders_count = Order.objects.all().count()
     orders = Order.objects.all()
