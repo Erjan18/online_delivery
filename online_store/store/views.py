@@ -8,7 +8,9 @@ from django.contrib.auth.forms import UserCreationForm
 from .forms import CustomerRegisterForm
 from django.contrib import messages
 from django.contrib.auth import login,authenticate,logout
+from .decorators import *
 
+@unauth_user
 def register(request):
     form = CustomerRegisterForm()
     if request.method == 'POST':
@@ -19,6 +21,11 @@ def register(request):
             return redirect('home')
     context = {'form':form}
     return render(request, 'store/register.html',context)
+
+def user_page(request):
+    orders = request.user.customer.order_set.all()
+    context = {'orders':orders}
+    return render(request, 'store/user.html', context)
 
 def login_page(request):
     if request.method == 'POST':
@@ -34,7 +41,9 @@ def login_page(request):
 def logout_page(request):
     logout(request)
     return redirect('login')
+
 @login_required(login_url='login')
+@admin_only
 def home_page(request):
     orders_count = Order.objects.all().count()
     orders = Order.objects.all()
@@ -48,7 +57,7 @@ def products_page(request):
     products = Products.objects.all()
     context = {'products':products}
     return render(request, 'store/products.html',context)
-
+@admin_only
 def costumer_page(request,pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
@@ -61,7 +70,7 @@ def costumer_page(request,pk):
 def create_order(request,pk):
     OrderFormSet = inlineformset_factory(Customer,Order,fields=('product','status'))
     customer = Customer.objects.get(id=pk)
-    formset = OrderFormSet(instance=customer)
+    formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
     if request.method == 'POST':
         formset = OrderFormSet(request.POST,instance=customer)
         if formset.is_valid():
