@@ -115,7 +115,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
+_PATH = os.path.abspath(os.path.dirname(__file__))
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(_PATH, 'files', 'media')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
