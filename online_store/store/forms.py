@@ -8,7 +8,6 @@ class Orderform(ModelForm):
         model = Order
         fields = '__all__'
 
-
 class CustomerRegisterForm(UserCreationForm):
     class Meta:
         model = User
