@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,redirect
 from .models import *
-from .forms import Orderform
+from .forms import Orderform, UserProfile
 from .filters import OrderFilterSet
 from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
@@ -66,6 +66,16 @@ def costumer_page(request,pk):
     orders = filterset.qs #Обращение к model
     context = {'customer':customer,'orders':orders,'orders_count':orders_count,'filterset':filterset}
     return render(request,'store/customer.html',context)
+
+def account_settings(request):
+    user =request.user.customer
+    form = UserProfile(instance=user)
+    if request.method == 'POST':
+        form = UserProfile(request.POST,request.FILES,instance=user)
+        if form.is_valid():
+            form.save()
+    context = {'form':form}
+    return render(request,'store/account.html', context)
 
 def create_order(request,pk):
     OrderFormSet = inlineformset_factory(Customer,Order,fields=('product','status'))
