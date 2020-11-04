@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -24,10 +25,12 @@ class Products(models.Model):
         return self.name
 
 class Customer(models.Model):
+    user = models.OneToOneField(User,null=True,blank=True,on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100, null=True)
     email = models.CharField(max_length=100, null=True)
     address =  models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=100,null=True)
+    img_field = models.ImageField()
 
     def __str__(self):
         return self.full_name
