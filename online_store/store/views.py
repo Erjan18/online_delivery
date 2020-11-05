@@ -16,7 +16,10 @@ def register(request):
     if request.method == 'POST':
         form = CustomerRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            group = Group.objects.get(name='Costomer')
+            Customer.objects.create(user=user,full_name=user.username)
+            user.groups.add(group)
             messages.success(request,'Success registration')
             return redirect('home')
     context = {'form':form}
@@ -26,15 +29,15 @@ def user_page(request):
     orders = request.user.customer.order_set.all()
     context = {'orders':orders}
     return render(request, 'store/user.html', context)
-
+@unauth_user
 def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request,username=username,password=password)
         login(request,user)
-        # if user is not None:
-        return redirect('home')
+        if user is not None:
+            return redirect('home')
     context = {}
     return render(request,'store/login.html',context)
 
@@ -107,3 +110,7 @@ def delete_order(request,pk):
         return redirect('/')
     context = {'order':order}
     return render(request,'store/delete.html',context)
+
+def youtube(request):
+    context = {}
+    return render(request, 'store/youtube.html',context)
