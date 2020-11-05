@@ -5,8 +5,6 @@ from django.db import models
 class Tag(models.Model):
     name = models.CharField(max_length=100,null=True)
 
-
-
 class Products(models.Model):
     CATEGORY = (
         ('Телефон','Телефон'),
